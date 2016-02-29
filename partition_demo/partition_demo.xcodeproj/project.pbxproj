@@ -13,6 +13,8 @@
 		978B84BA1C84D97600D2271D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 978B84B81C84D97600D2271D /* Main.storyboard */; };
 		978B84BC1C84D97600D2271D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 978B84BB1C84D97600D2271D /* Assets.xcassets */; };
 		978B84BF1C84D97600D2271D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 978B84BD1C84D97600D2271D /* LaunchScreen.storyboard */; };
+		978B84C71C84DAC400D2271D /* ImagePartition.m in Sources */ = {isa = PBXBuildFile; fileRef = 978B84C61C84DAC400D2271D /* ImagePartition.m */; };
+		978B84C91C84DAEC00D2271D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 978B84C81C84DAEC00D2271D /* CoreGraphics.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,9 @@
 		978B84BB1C84D97600D2271D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		978B84BE1C84D97600D2271D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		978B84C01C84D97600D2271D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		978B84C61C84DAC400D2271D /* ImagePartition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePartition.m; sourceTree = "<group>"; };
+		978B84C81C84DAEC00D2271D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		978B84CA1C84DB1200D2271D /* ImagePartition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePartition.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				978B84C91C84DAEC00D2271D /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +48,7 @@
 		978B84A31C84D97500D2271D = {
 			isa = PBXGroup;
 			children = (
+				978B84C81C84DAEC00D2271D /* CoreGraphics.framework */,
 				978B84AE1C84D97600D2271D /* partition_demo */,
 				978B84AD1C84D97500D2271D /* Products */,
 			);
@@ -62,6 +69,8 @@
 				978B84B31C84D97600D2271D /* AppDelegate.m */,
 				978B84B51C84D97600D2271D /* ViewController.h */,
 				978B84B61C84D97600D2271D /* ViewController.m */,
+				978B84C61C84DAC400D2271D /* ImagePartition.m */,
+				978B84CA1C84DB1200D2271D /* ImagePartition.h */,
 				978B84B81C84D97600D2271D /* Main.storyboard */,
 				978B84BB1C84D97600D2271D /* Assets.xcassets */,
 				978B84BD1C84D97600D2271D /* LaunchScreen.storyboard */,
@@ -149,6 +158,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				978B84C71C84DAC400D2271D /* ImagePartition.m in Sources */,
 				978B84B71C84D97600D2271D /* ViewController.m in Sources */,
 				978B84B41C84D97600D2271D /* AppDelegate.m in Sources */,
 				978B84B11C84D97600D2271D /* main.m in Sources */,
