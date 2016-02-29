@@ -37,10 +37,19 @@
     // the limit to treat as black
     int threshold = [self processImage];
     
-    NSArray *vertical = [self verticalStrips:threshold];
-    NSLog(@"%@", vertical);
+    NSArray *verticalStrips = [self verticalStrips:threshold];
+    NSLog(@"%@", verticalStrips);
     
-    NSSet *images = [[NSSet alloc] initWithObjects:_image, nil];
+    NSMutableSet *images = [[NSMutableSet alloc] initWithCapacity:verticalStrips.count];
+    
+    for (NSValue *value in verticalStrips) {
+        NSRange range = value.rangeValue;
+        CGRect selection = CGRectMake(0, range.location, _image.size.width, range.length);
+        CGImageRef imageRef = CGImageCreateWithImageInRect([_image CGImage], selection);
+        [images addObject:[UIImage imageWithCGImage:imageRef]];
+        CGImageRelease(imageRef);
+    }
+    
     return images;
 }
 
