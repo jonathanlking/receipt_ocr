@@ -23,7 +23,7 @@
     
     // Create the ImagePartition(er)
     ImagePartition *partitioner
-        = [[ImagePartition alloc] initWithImage:[UIImage imageNamed:@"sainsbury.png"]];
+        = [[ImagePartition alloc] initWithImage:[UIImage imageNamed:@"sainsbury_crop"]];
     
     // Partition the image and populate a UIScrollView with its children
     _images = [partitioner partitionToimages];
