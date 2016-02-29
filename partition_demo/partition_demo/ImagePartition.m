@@ -35,7 +35,9 @@
     // partition the image
     
     // the limit to treat as black
-    int limit = [self processImage];
+    int threshold = [self processImage];
+    
+    NSArray *vertical = [self verticalStrips:threshold];
     
     NSSet *images = [[NSSet alloc] initWithObjects:_image, nil];
     return images;
@@ -78,18 +80,63 @@
     }
     
     // Somehow determine the threshold value
-    for (int i = 0; i < colour_space; i++) {
-        printf("%d ", histogram[i]);
-    }
+    
+//    for (int i = 0; i < colour_space; i++) {
+//        printf("%d ", histogram[i]);
+//    }
     
     free(histogram);
     return 40; // hard coded at 40 for now
 }
 
-- (NSArray *)verticalStrips {
+- (NSArray *)verticalStrips:(int)threshold {
     NSMutableArray *array = [[NSMutableArray alloc] init];
     
+    // Load image pixels into inputPixels array
+    CGImageRef inputCGImage = [_image CGImage];
+    NSUInteger inputWidth = CGImageGetWidth(inputCGImage);
+    NSUInteger inputHeight = CGImageGetHeight(inputCGImage);
     
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    NSUInteger bytesPerPixel = 4;
+    NSUInteger bitsPerComponent = 8;
+    
+    NSUInteger inputBytesPerRow = bytesPerPixel * inputWidth;
+    UInt32 *inputPixels = (UInt32 *)calloc(inputHeight * inputWidth, sizeof(UInt32));
+    
+    CGContextRef context = CGBitmapContextCreate(inputPixels, inputWidth, inputHeight,
+                                                 bitsPerComponent, inputBytesPerRow, colorSpace,
+                                                 kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    
+    CGContextDrawImage(context, CGRectMake(0, 0, inputWidth, inputHeight), inputCGImage);
+    
+    
+    int *rowCount = (int *)calloc(inputHeight, (sizeof(int)));
+    
+    for (int j = 0; j < inputHeight; j++) {
+        for (int i = 0; i < inputWidth; i++) {
+            
+            UInt32 * currentPixel = inputPixels + (j * inputWidth) + i;
+            UInt32 color = *currentPixel;
+            
+            // Choose the minimum
+            UInt32 minColour = MIN(MIN(R(color), G(color)), B(color));
+            if (minColour < threshold) {
+               rowCount[j]++;
+            }
+        }
+    }
+    
+    for (int i = 0; i < inputHeight; i++) {
+        printf("%d ", rowCount[i]);
+    }
+    
+    // Find the start and end pixels for the rows
+    
+    // Perform fancy analysis to only include rows which are similar to the mean height
+    
+    free(rowCount);
     
     return array;
 }
