@@ -13,6 +13,8 @@
 
 @interface ImagePartition : NSObject
 - (instancetype)initWithImage:(UIImage *)image;
+
+// Synchronously calculates the sub images and returns a set of UIImages
 - (NSSet *)partitionToimages;
 @end
 

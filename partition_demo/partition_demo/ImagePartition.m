@@ -19,14 +19,14 @@
     if (self = [super init]) {
         // Perform setup here
         _image = image;
-        NSLog(@"Impage partition create");
     }
     return self;
 }
 
 - (NSSet *)partitionToimages {
     // partition the image
-    return nil;
+    NSSet *images = [[NSSet alloc] initWithObjects:_image, nil];
+    return images;
 }
 
 @end
