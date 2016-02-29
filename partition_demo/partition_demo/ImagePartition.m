@@ -38,6 +38,7 @@
     int threshold = [self processImage];
     
     NSArray *vertical = [self verticalStrips:threshold];
+    NSLog(@"%@", vertical);
     
     NSSet *images = [[NSSet alloc] initWithObjects:_image, nil];
     return images;
@@ -133,6 +134,25 @@
     }
     
     // Find the start and end pixels for the rows
+    
+    NSUInteger start = 0;
+    NSUInteger end = 0;
+    
+    for (int i = 0; i < inputHeight; i++) {
+        if (rowCount[i] == 0) {
+            // if beggining, then start < end
+            if (start >= end) {
+                start = i + 1; // This row is empty, so provisionally set the start as the next row
+            } else {
+                end = i;
+                NSRange range = NSMakeRange(start, end - start);
+                [array addObject:[NSValue valueWithRange:range]];
+                start = i + 1; // Provisionally set the start as the next row
+            }
+        } else {
+            end += 1;
+        }
+    }
     
     // Perform fancy analysis to only include rows which are similar to the mean height
     
