@@ -37,17 +37,21 @@
     // the limit to treat as black
     int threshold = [self processImage];
     
-    NSArray *verticalStrips = [self verticalStrips:threshold];
-    NSLog(@"%@", verticalStrips);
+    NSArray *horizontalStripes = [self horizontalStripes:threshold];
+    NSLog(@"%@", horizontalStripes);
     
-    NSMutableSet *images = [[NSMutableSet alloc] initWithCapacity:verticalStrips.count];
+    NSMutableSet *images = [[NSMutableSet alloc] initWithCapacity:horizontalStripes.count];
     
-    for (NSValue *value in verticalStrips) {
-        NSRange range = value.rangeValue;
-        CGRect selection = CGRectMake(0, range.location, _image.size.width, range.length);
-        CGImageRef imageRef = CGImageCreateWithImageInRect([_image CGImage], selection);
-        [images addObject:[UIImage imageWithCGImage:imageRef]];
-        CGImageRelease(imageRef);
+    for (NSValue *stripeValue in horizontalStripes) {
+        NSRange stripe = stripeValue.rangeValue;
+        NSArray *tokens = [self tokensWithStrip:stripe andThreshold:threshold];
+        NSLog(@"%lu", tokens.count);
+        for (NSValue *boundValue in tokens) {
+            CGRect bound = boundValue.CGRectValue;
+            CGImageRef imageRef = CGImageCreateWithImageInRect([_image CGImage], bound);
+            [images addObject:[UIImage imageWithCGImage:imageRef]];
+            CGImageRelease(imageRef);
+        }
     }
     
     return images;
@@ -99,7 +103,109 @@
     return 40; // hard coded at 40 for now
 }
 
-- (NSArray *)verticalStrips:(int)threshold {
+- (NSArray *)tokensWithStrip:(NSRange)stripe andThreshold:(int)threshold {
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    
+    // Load image pixels into inputPixels array
+    CGImageRef inputCGImage = [_image CGImage];
+    NSUInteger inputWidth = CGImageGetWidth(inputCGImage);
+    NSUInteger inputHeight = CGImageGetHeight(inputCGImage);
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    NSUInteger bytesPerPixel = 4;
+    NSUInteger bitsPerComponent = 8;
+    
+    NSUInteger inputBytesPerRow = bytesPerPixel * inputWidth;
+    UInt32 *inputPixels = (UInt32 *)calloc(inputHeight * inputWidth, sizeof(UInt32));
+    
+    CGContextRef context = CGBitmapContextCreate(inputPixels, inputWidth, inputHeight,
+                                                 bitsPerComponent, inputBytesPerRow, colorSpace,
+                                                 kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    
+    CGContextDrawImage(context, CGRectMake(0, 0, inputWidth, inputHeight), inputCGImage);
+    
+    int *colCount = (int *)calloc(inputWidth, (sizeof(int)));
+    
+    for (NSUInteger j = stripe.location; j < NSMaxRange(stripe) ; j++) {
+        for (int i = 0; i < inputWidth; i++) {
+            
+            UInt32 * currentPixel = inputPixels + (j * inputWidth) + i;
+            UInt32 color = *currentPixel;
+            
+            // Choose the minimum
+            UInt32 minColour = MIN(MIN(R(color), G(color)), B(color));
+            if (minColour < threshold + 50) {
+                colCount[i]++;
+            }
+        }
+    }
+    
+    for (int i = 0; i < inputWidth; i++) {
+        printf("%d, ", colCount[i]);
+    }
+    NSLog(@"After");
+    
+    NSUInteger start = 0;
+    NSUInteger end = 0;
+    int gap =4;
+    bool running = false;
+    
+    for (int i = 0; i < inputWidth; i++) {
+        
+        if (colCount[i] == 0) {
+            // if we are currently in an island, we should stop
+            if (running) {
+                
+                if (gap == 0) {
+                    end = i;
+                    
+//                    if (end - start < 15) break;
+                    
+                    CGRect bounds = CGRectMake(start, stripe.location, end - start, stripe.length);
+                    [array addObject:[NSValue valueWithCGRect:bounds]];
+                    running = false;
+                } else {
+                    gap -= 1;
+                }
+                
+
+            }
+        } else {
+            if (!running) {
+                start = i;
+                running = true;
+            }
+            
+            gap = 4;
+        }
+        
+    }
+    
+//    for (int i = 0; i < inputWidth; i++) {
+//        printf("%d", colCount[i]);
+//        if (colCount[i] == 0) {
+//            // if beggining, then start < end
+//            if (start >= end) {
+//                start = i + 1; // This row is empty, so provisionally set the start as the next row
+//            } else {
+//                end = i;
+//                CGRect bounds = CGRectMake(start, stripe.location, end - start, stripe.length);
+//                NSLog(@"Chun");
+////                [array addObject:[NSValue valueWithCGRect:bounds]];
+//                start = i + 1; // Provisionally set the start as the next row
+//            }
+//        } else {
+//            end += 1;
+//        }
+//    }
+    
+    free(colCount);
+    NSLog(@"%d in array", array.count);
+    return array;
+}
+
+- (NSArray *)horizontalStripes:(int)threshold {
     NSMutableArray *array = [[NSMutableArray alloc] init];
     
     // Load image pixels into inputPixels array
@@ -124,6 +230,8 @@
     
     int *rowCount = (int *)calloc(inputHeight, (sizeof(int)));
     
+    
+    
     for (int j = 0; j < inputHeight; j++) {
         for (int i = 0; i < inputWidth; i++) {
             
@@ -138,9 +246,9 @@
         }
     }
     
-    for (int i = 0; i < inputHeight; i++) {
-        printf("%d ", rowCount[i]);
-    }
+//    for (int i = 0; i < inputHeight; i++) {
+//        printf("%d ", rowCount[i]);
+//    }
     
     // Find the start and end pixels for the rows
     
